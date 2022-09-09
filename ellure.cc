@@ -9,8 +9,12 @@
 
 #include "chain.h"
 #include "doc.h"
+#include "pos.h"
 #include "user.h"
 #include "weighted_vector.h"
+
+extern void lapos_init();
+extern std::string lapos_main(const std::string& input);
 
 int main(int argc, char* argv[])
 {
@@ -25,7 +29,9 @@ int main(int argc, char* argv[])
 
     Ellure::Doc doc{"data/testdoc"};
 
-    // TEST.
+    lapos_init();
+
+    // Build Markov chain from test data.
     srand(time(NULL));
     Ellure::Chain<std::string> chain;
     const auto& strings = doc.get_words();
@@ -36,16 +42,18 @@ int main(int argc, char* argv[])
     chain.prepare();
     chain.reset();
 
+    // Build sample output from Markov chain.
+    std::string output;
     std::string last;
-    for (size_t i = 0; i < 150; ++i)
+    for (size_t i = 0; i < 15; ++i)
     {
         const auto& t = chain.get();
 
         if (last != "" && last != "\n" && t != ",")
         {
-            std::cout <<  " ";
+            output += " ";
         }
-        std::cout << t;
+        output += t;
 
         // Alpha.
         if (!(rand() % 10))
@@ -55,7 +63,15 @@ int main(int argc, char* argv[])
 
         last = t;
     }
-    std::cout << std::endl;
+    output += '\n';
+    std::cout << output;
+
+    // POS tag the sample output.
+    auto pos_output = lapos_main(output);
+    std::cout << "=====\n" << pos_output;
+
+    // Build Markov chain of POS orders.
+    Ellure::POS pos{pos_output};
     
     return 0;
 }

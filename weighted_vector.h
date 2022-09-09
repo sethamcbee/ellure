@@ -11,26 +11,28 @@
 namespace Ellure
 {
 
+typedef double Weight;
+
 template <class T>
 class WeightedVector
 {
 public:
 
-    void insert(const T& t)
+    void insert(const T& t, Weight w)
     {
-        ++totalWeight;
+        totalWeight += w;
 
         for (size_t i = 0; i < elements.size(); ++i)
         {
             if (elements[i] == t)
             {
-                weights[i] += 1;
+                weights[i] += w;
                 return;
             }
         }
         // Else, add new element.
         elements.push_back(t);
-        weights.push_back(1);
+        weights.push_back(w);
     }
 
     void prepare()
@@ -51,8 +53,8 @@ public:
 private:
 
     std::vector<T> elements;
-    std::vector<int> weights;
-    int totalWeight = 0;
+    std::vector<Weight> weights;
+    Weight totalWeight = 0;
     std::discrete_distribution<> distribution;
 };
 

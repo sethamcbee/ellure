@@ -13,6 +13,8 @@
 namespace Ellure
 {
 
+static const Weight default_weight{1.0};
+
 template <class T>
 struct ChainState
 {
@@ -64,7 +66,7 @@ public:
         }
 
         // Add new link to chain.
-        states[i_cur].sequences.insert(i_next);
+        states[i_cur].sequences.insert(i_next, default_weight);
         ++links;
     }
 
