@@ -20,7 +20,7 @@ public:
 
     void insert(const T& t, Weight w)
     {
-        totalWeight += w;
+        total_weight += w;
 
         for (size_t i = 0; i < elements.size(); ++i)
         {
@@ -60,7 +60,7 @@ public:
         else
         {
             auto i = std::distance(elements.begin(), it);
-            return weights[i];
+            return weights[i] / total_weight;
         }
     }
     
@@ -68,7 +68,7 @@ private:
 
     std::vector<T> elements;
     std::vector<Weight> weights;
-    Weight totalWeight = 0;
+    Weight total_weight = 0;
     std::discrete_distribution<> distribution;
 };
 

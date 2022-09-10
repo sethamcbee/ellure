@@ -94,7 +94,7 @@ public:
 
     Weight get_weight(const T& first, const T& second)
     {
-        const Weight fallback_weight = 0.1 / links;
+        const Weight fallback_weight = 0.001 / links;
 
         const auto it0 = state_map.find(first);
         const auto it1 = state_map.find(second);
@@ -105,7 +105,7 @@ public:
 
         int i0 = it0->second;
         int i1 = it1->second;
-        auto weight = states[i0].find_weight(i1);
+        auto weight = states[i0].sequences.find_weight(i1);
         if (weight < fallback_weight)
         {
             return fallback_weight;

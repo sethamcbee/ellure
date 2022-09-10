@@ -29,7 +29,15 @@ std::string SimpleWordChain::get_line()
         {
             output += " ";
         }
-        output += t;
+
+        if (t != "\n")
+        {
+            output += t;
+        }
+        else
+        {
+            data.reset();
+        }
 
         // Alpha.
         if (!(rand() % 10))
