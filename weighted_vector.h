@@ -50,6 +50,20 @@ public:
         return elements[distribution(g)];
     }
 
+    Weight find_weight(const T& t)
+    {
+        auto it = std::find(elements.begin(), elements.end(), t);
+        if (it == elements.end())
+        {
+            return 0;
+        }
+        else
+        {
+            auto i = std::distance(elements.begin(), it);
+            return weights[i];
+        }
+    }
+    
 private:
 
     std::vector<T> elements;
