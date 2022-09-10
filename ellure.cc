@@ -4,6 +4,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
 
@@ -49,22 +50,18 @@ int main(int argc, char* argv[])
     Ellure::POS pos{pos_output};
 
     // Test POSChain weight calculation.
-    std::string winner;
-    Ellure::Weight max = 0;
+    std::map<Ellure::Weight, std::string> map;
     for (size_t i = 0; i < 100; ++i)
     {
         auto line = word_chain.get_line();
-        std::cout << line << " : ";
         auto weight = pos_chain.calc_line_weight(line);
-        std::cout << weight << std::endl;
-
-        if (weight > max)
-        {
-            max = weight;
-            winner = line;
-        }
+        map[weight] = line;
     }
-    std::cout << "winner: " << winner << " : " << max << std::endl;
+    for (const auto& pair : map)
+    {
+        std::cout << pair.first << "\n: ";
+        std::cout << pair.second << std::endl;
+    }
     
     return 0;
 }

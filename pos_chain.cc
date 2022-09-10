@@ -93,10 +93,9 @@ Weight POSChain::calc_line_weight(const std::string& input)
         auto gram0 = std::tuple{pos_data[i], pos_data[i + 1]};
         auto gram1 = std::tuple{pos_data[i + 1], pos_data[i + 2]};
         auto sub_weight = data.get_weight(gram0, gram1);
-        total += sqrt(sub_weight * last);
-        last = sub_weight;
+        total += sub_weight;
     }
-    return total / pos_data.size();
+    return log(total) / pos_data.size();
 }
 
 }
