@@ -21,29 +21,35 @@ POSChain::POSChain(const std::vector<std::string>& input)
         {
             auto line_pos = lapos_main(line);
             POS pos{line_pos};
-            const auto& pos_data = pos.get_data();
+            const auto& pos_data = pos.get_data()[0];
 
             // Catch blank lines.
-            if (pos_data[0].size() == 0)
+            if (pos_data.size() == 0)
             {
                 line = "";
                 continue;
             }
 
             // Catch lines with a single word.
-            if (pos_data[0].size() == 1)
+            if (pos_data.size() == 1)
             {
-                data.insert(pos_data[0][0], "END");
+                auto gram0 = std::tuple{pos_data[0], "END"};
+                auto gram1 = std::tuple{"END", "END"};
+                data.insert(gram0, gram1);
                 line = "";
                 continue;
             }
 
-            // Else, add to chain.
-            for (size_t j = 0; j < pos_data[0].size() - 1; ++j)
+            // Else, add to chain normally.
+            for (size_t j = 0; j < pos_data.size() - 2; ++j)
             {
-                data.insert(pos_data[0][j], pos_data[0][j + 1]);
+                auto gram0 = std::tuple{pos_data[j], pos_data[j + 1]};
+                auto gram1 = std::tuple{pos_data[j + 1], pos_data[j + 2]};
+                data.insert(gram0, gram1);
             }
-            data.insert(pos_data[0][pos_data[0].size() - 1], "END");
+            auto gram0 = std::tuple{pos_data[pos_data.size() - 1], "END"};
+            auto gram1 = std::tuple{"END", "END"};
+            data.insert(gram0, gram1);
             line = "";
         }
         else
@@ -75,14 +81,18 @@ Weight POSChain::calc_line_weight(const std::string& input)
     // Catch lines with a single word.
     if (pos_data.size() == 1)
     {
-        return data.get_weight(pos_data[0], "END");
+        auto gram0 = std::tuple{pos_data[0], "END"};
+        auto gram1 = std::tuple{"END", "END"};
+        return data.get_weight(gram0, gram1);
     }
 
     Weight last = 1.0;
     Weight total = 0.0;
-    for (size_t i = 0; i < pos_data.size() - 1; ++i)
+    for (size_t i = 0; i < pos_data.size() - 2; ++i)
     {
-        auto sub_weight = data.get_weight(pos_data[i], pos_data[i + 1]);
+        auto gram0 = std::tuple{pos_data[i], pos_data[i + 1]};
+        auto gram1 = std::tuple{pos_data[i + 1], pos_data[i + 2]};
+        auto sub_weight = data.get_weight(gram0, gram1);
         total += sqrt(sub_weight * last);
         last = sub_weight;
     }

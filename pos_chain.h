@@ -5,6 +5,7 @@
 #pragma once
 
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "chain.h"
@@ -22,7 +23,7 @@ public:
 
 private:
 
-    Chain<std::string> data;
+    Chain<std::tuple<std::string, std::string>> data;
 };
     
 }
