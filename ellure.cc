@@ -59,8 +59,8 @@ int main(int argc, char* argv[])
     }
     for (const auto& pair : map)
     {
-        std::cout << pair.first << "\n: ";
-        std::cout << pair.second << std::endl;
+        std::cout << pair.second << "\n: ";
+        std::cout << pair.first << std::endl;
     }
     
     return 0;
