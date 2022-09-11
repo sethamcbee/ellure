@@ -50,7 +50,7 @@ public:
         return elements[distribution(g)];
     }
 
-    Weight find_weight(const T& t)
+    Weight find_weight(const T& t) const
     {
         auto it = std::find(elements.begin(), elements.end(), t);
         if (it == elements.end())
@@ -62,6 +62,15 @@ public:
             auto i = std::distance(elements.begin(), it);
             return weights[i] / total_weight;
         }
+    }
+
+    size_t size_bytes() const
+    {
+        size_t size = sizeof(WeightedVector<T>);
+        size += sizeof(T) * elements.size();
+        size += sizeof(Weight) * weights.size();
+        size += sizeof(double) * weights.size();
+        return size;
     }
     
 private:

@@ -52,4 +52,11 @@ std::string SimpleWordChain::get_line()
     return output;
 }
 
+size_t SimpleWordChain::size_bytes() const
+{
+    size_t size = sizeof(SimpleWordChain);
+    size += data.size_bytes();
+    return size;
+}
+
 }

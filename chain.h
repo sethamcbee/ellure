@@ -122,6 +122,17 @@ public:
         state = rand() % max;
     }
 
+    size_t size_bytes() const
+    {
+        size_t size = sizeof(Chain<T>);
+        size += sizeof(ChainState<T>) * states.size();
+        for (const auto& state : states)
+        {
+            size += state.sequences.size_bytes();
+        }
+        return size;
+    }
+
 private:
 
     std::mt19937 rng{(long unsigned int)time(NULL)};

@@ -20,6 +20,8 @@ public:
 
     std::string get_line();
 
+    size_t size_bytes() const;
+
 private:
 
     Chain<std::string> data;
