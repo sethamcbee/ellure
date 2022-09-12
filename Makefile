@@ -13,7 +13,7 @@ OUTPUT = ellure
 
 # Check if we are debugging.
 ifeq ($(RELEASE), 0)
-	CXXFLAGS += -fverbose-asm -ggdb -O0
+	CXXFLAGS += -fverbose-asm -ggdb -O2
 else
 	CXXFLAGS += -O2 -DNDEBUG # -flto
 endif
