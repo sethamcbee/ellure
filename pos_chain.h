@@ -23,7 +23,7 @@ public:
 
 private:
 
-    Chain<std::tuple<std::string, std::string, std::string>> data;
+    Chain<std::tuple<std::string, std::string>> data;
 };
     
 }

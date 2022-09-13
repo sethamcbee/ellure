@@ -9,6 +9,7 @@
 #include <string>
 
 #include "chain.h"
+#include "complex_word_chain.h"
 #include "doc.h"
 #include "pos.h"
 #include "pos_chain.h"
@@ -38,7 +39,23 @@ int main(int argc, char* argv[])
     Ellure::POSChain pos_chain{strings};
 
     // Build Markov chain from test data.
-    //Ellure::SimpleWordChain word_chain{strings};
+    Ellure::ComplexWordChain word_chain{strings};
+
+    // Test.
+    std::vector<std::tuple<Ellure::Weight, std::string>> lines;
+    for (size_t i = 0; i < 100; ++i)
+    {
+        auto line = word_chain.get_line();
+        auto weight = pos_chain.calc_line_weight(line);
+        auto tmp = std::tuple{weight, line};
+        lines.push_back(tmp);
+    }
+    std::sort(lines.begin(), lines.end());
+    for (const auto& pair : lines)
+    {
+        std::cout << std::get<1>(pair);
+        std::cout << "\n: " << std::get<0>(pair) << std::endl;
+    }
     
     return 0;
 }

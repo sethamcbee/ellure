@@ -87,7 +87,14 @@ public:
         const auto& ret = states[state].element;
         
         // Advance internal state.
-        state = states[state].sequences.get(rng);
+        if (states[state].sequences.size() > 0)
+        {
+            state = states[state].sequences.get(rng);
+        }
+        else
+        {
+            reset();
+        }
 
         return ret;
     }

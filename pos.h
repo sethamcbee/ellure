@@ -16,11 +16,11 @@ public:
 
     POS(const std::string& input);
 
-    const std::vector<std::vector<std::string>>& get_data();
+    const std::vector<std::string>& get_data();
 
 private:
 
-    std::vector<std::vector<std::string>> data;
+    std::vector<std::string> data;
 };
 
 }

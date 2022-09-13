@@ -9,19 +9,16 @@ namespace Ellure
 
 POS::POS(const std::string& input)
 {
-    std::vector<std::string> blank_line;
-    data.push_back(blank_line);
-    std::vector<std::string>* line = &data[0];
-    for (size_t i = 0; i < input.size(); ++i)
+    data.push_back("[START]");
+    for (size_t i = 1; i < input.size(); ++i)
     {
         // Skip characters until POS tag or newline.
         while (input[i] != '/')
         {
             if (input[i] == '\n')
             {
-                data.push_back(blank_line);
-                ++line;
-                continue;
+                data.push_back("[END]");
+                return;
             }
             ++i;
         }
@@ -33,11 +30,12 @@ POS::POS(const std::string& input)
             word += input[i];
             ++i;
         }
-        line->push_back(word);
+        data.push_back(word);
     }
+    data.push_back("[END]");
 }
 
-const std::vector<std::vector<std::string>>& POS::get_data()
+const std::vector<std::string>& POS::get_data()
 {
     return data;
 }

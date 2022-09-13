@@ -11,6 +11,8 @@
 #include "doc.h"
 #include "weighted_vector.h"
 
+extern void tokenize_ellure(const std::string & s1, std::vector<std::string> & lt);
+
 namespace Ellure
 {
 
@@ -26,12 +28,45 @@ Doc::Doc(const std::string& filename)
     }
     input << input_file.rdbuf();
 
-    std::string str = input.str();
+    // Use tokenizer from lapos.
+    std::vector<std::string> tok_v;
+    tokenize_ellure(input.str(), tok_v);
+    std::string tok_str;
+    tok_str += tok_v[0];
+    for (size_t i = 1; i < tok_v.size(); ++i)
+    {
+        // Handle newlines.
+        if (tok_v[i] == "[NEWLINE]")
+        {
+            // Condense multiple newlines.
+            if (tok_v[i - 1] != "[NEWLINE]")
+            {
+                tok_str += '\n';
+            }
+            continue;
+        }
+        
+        if (tok_v[i] != "," && tok_v[i - 1] != "[NEWLINE]")
+        {
+            tok_str += ' ';
+        }
+        tok_str += tok_v[i];
+    }
+
+    words.push_back("[START]");
+    std::string str = tok_str;
     const char* p = str.c_str();
     while (*p)
     {
         p = get_word(p);
     }
+
+    // Remove hanging sentence start.
+    if (words[words.size() - 1] == "[START]")
+    {
+        words.pop_back();
+    }
+    words.shrink_to_fit();
 }
 
 const std::vector<std::string>& Doc::get_words() const
@@ -68,10 +103,17 @@ const char* Doc::get_word(const char* input)
     // Iterate if this word starts on a bad character.
     while (!is_good(*input) && *input != '\0')
     {        
-        if (*input == ',' || *input == '\n')
+        if (*input == ',')
         {
             word += *input;
             words.push_back(word);
+            ++input;
+            return input;
+        }
+        else if (*input == '\n')
+        {
+            words.push_back("[END]");
+            words.push_back("[START]");
             ++input;
             return input;
         }
@@ -84,7 +126,7 @@ const char* Doc::get_word(const char* input)
 
     do
     {
-        word += tolower(*input);
+        word += *input;
         ++input;
     }
     while (is_good(*input));

@@ -64,6 +64,11 @@ public:
         }
     }
 
+    size_t size() const
+    {
+        return elements.size();
+    }
+
     size_t size_bytes() const
     {
         size_t size = sizeof(WeightedVector<T>);
