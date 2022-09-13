@@ -42,19 +42,20 @@ int main(int argc, char* argv[])
     Ellure::ComplexWordChain word_chain{strings};
 
     // Test.
-    std::vector<std::tuple<Ellure::Weight, std::string>> lines;
-    for (size_t i = 0; i < 100; ++i)
+    std::cout << "=====\nunigrams:\n=====\n";
+    for (size_t i = 0; i < 10; ++i)
     {
-        auto line = word_chain.get_line();
-        auto weight = pos_chain.calc_line_weight(line);
-        auto tmp = std::tuple{weight, line};
-        lines.push_back(tmp);
+        std::cout << word_chain.get_line_unigrams() << std::endl;
     }
-    std::sort(lines.begin(), lines.end());
-    for (const auto& pair : lines)
+    std::cout << "=====\nbigrams:\n=====\n";
+    for (size_t i = 0; i < 10; ++i)
     {
-        std::cout << std::get<1>(pair);
-        std::cout << "\n: " << std::get<0>(pair) << std::endl;
+        std::cout << word_chain.get_line_bigrams() << std::endl;
+    }
+    std::cout << "=====\ntrigrams:\n=====\n";
+    for (size_t i = 0; i < 10; ++i)
+    {
+        std::cout << word_chain.get_line_trigrams() << std::endl;
     }
     
     return 0;

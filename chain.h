@@ -87,14 +87,11 @@ public:
         const auto& ret = states[state].element;
         
         // Advance internal state.
-        if (states[state].sequences.size() > 0)
-        {
-            state = states[state].sequences.get(rng);
-        }
-        else
+        while (states[state].sequences.size() == 0)
         {
             reset();
         }
+        state = states[state].sequences.get(rng);
 
         return ret;
     }
@@ -127,6 +124,11 @@ public:
     {
         size_t max = states.size();
         state = rand() % max;
+    }
+
+    void set_state(const T& s)
+    {
+        state = state_map[s];
     }
 
     size_t size_bytes() const

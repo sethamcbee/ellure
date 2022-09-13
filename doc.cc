@@ -126,7 +126,7 @@ const char* Doc::get_word(const char* input)
 
     do
     {
-        word += *input;
+        word += tolower(*input);
         ++input;
     }
     while (is_good(*input));
