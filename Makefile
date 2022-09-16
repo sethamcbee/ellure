@@ -2,7 +2,7 @@
 CXX ?= g++
 CXXFLAGS ?= -std=c++17 -march=native -Wall
 CXXFLAGS += $(INCLUDE_SCRIPT)
-LD_INPUT = -lstdc++fs
+LD_INPUT = -lstdc++fs -lSDL2main -lSDL2
 RELEASE ?= 0
 PROFILE ?= 0
 

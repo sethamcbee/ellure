@@ -276,10 +276,11 @@ void ComplexWordChain::construct_unigrams(const std::vector<std::string>& input)
             continue;
         }
 
+        Weight weight{1.0 / input.size()};
         bool first = true;
-        for (size_t i = start + 1; i < end; ++i)
+        for (size_t i = start; i < end; ++i)
         {
-            unigrams.insert(input[i], input[i + 1]);
+            unigrams.insert(input[i], input[i + 1], weight);
             if (first)
             {
                 first = false;
@@ -325,12 +326,13 @@ void ComplexWordChain::construct_bigrams(const std::vector<std::string>& input)
         const auto& pos_data = pos.get_data();
 
         // Build chain, including START and END tokens.
+        Weight weight{1.0 / pos_data.size()};
         bool first = true;
         for (size_t i = 1; i < pos_data.size() - 1; ++i)
         {
             auto gram0 = std::tuple{pos_data[i - 1], input[start + i]};
             auto gram1 = std::tuple{pos_data[i], input[start + i + 1]};
-            bigrams.insert(gram0, gram1);
+            bigrams.insert(gram0, gram1, weight);
             if (first)
             {
                 first = false;
@@ -379,11 +381,12 @@ void ComplexWordChain::construct_trigrams(const std::vector<std::string>& input)
         const auto& pos_data = pos.get_data();
 
         // Check for short line.
+        Weight weight{1.0 / pos_data.size()};
         if (end - start < 3) // START{0} he{1} died{2} END{3}
         {
             auto gram0 = std::tuple{"[START]", "[START]", input[start + 1]};
             auto gram1 = std::tuple{"[START]", input[start + 1], "[END]"};
-            trigrams.insert(gram0, gram1);
+            trigrams.insert(gram0, gram1, weight);
             trigram_beginnings.insert(gram0, 1.0);
             start = end;
             continue;
@@ -392,7 +395,7 @@ void ComplexWordChain::construct_trigrams(const std::vector<std::string>& input)
         // Build padded starting trigram.
         auto gram_start = std::tuple{"[START]", "[START]", input[start + 1]};
         auto gram_second = std::tuple{"[START]", pos_data[1], input[start + 2]};
-        trigrams.insert(gram_start, gram_second);
+        trigrams.insert(gram_start, gram_second, weight);
         trigram_beginnings.insert(gram_start, 1.0);
 
         // Build chain, including START and END tokens.
@@ -400,7 +403,7 @@ void ComplexWordChain::construct_trigrams(const std::vector<std::string>& input)
         {
             auto gram0 = std::tuple{pos_data[i - 2], pos_data[i - 1], input[start + i]};
             auto gram1 = std::tuple{pos_data[i - 1], pos_data[i], input[start + i + 1]};
-            trigrams.insert(gram0, gram1);
+            trigrams.insert(gram0, gram1, weight);
         }
 
         // Iterate to next line.

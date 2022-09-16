@@ -11,6 +11,7 @@
 #include "chain.h"
 #include "complex_word_chain.h"
 #include "doc.h"
+#include "gui/gui.h"
 #include "pos.h"
 #include "pos_chain.h"
 #include "simple_word_chain.h"
@@ -27,6 +28,9 @@ int main(int argc, char* argv[])
         std::cerr << "Invalid arguments.\n";
         return 1;
     }
+
+    int gui_ret = Ellure::gui_main();
+    return gui_ret;
 
     // STUB initialization.
     srand(time(NULL));
