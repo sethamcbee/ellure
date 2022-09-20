@@ -4,6 +4,7 @@
 
 #include "gui.h"
 
+#include <cstring>
 #include <iostream>
 #include <string>
 
@@ -23,7 +24,7 @@ extern std::string lapos_main(const std::string& input);
 namespace Ellure
 {
 
-void gui_editor()
+void gui_editor(Ellure::ComplexWordChain& word_chain)
 {
     static ImGuiInputTextFlags flags = ImGuiInputTextFlags_AllowTabInput;
     static char text[1024 * 160];
@@ -42,14 +43,25 @@ void gui_editor()
     //ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::Begin("Editor", &p_open, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoResize);
 
-    auto editor_height = ImGui::GetWindowHeight() - 1.25f * ImGui::GetTextLineHeight();
+    auto editor_height = ImGui::GetWindowHeight() - 1.2f * ImGui::GetTextLineHeight();
     bool updated = ImGui::InputTextMultiline(
-        "##source",
+        "##editor",
         text,
         IM_ARRAYSIZE(text),
         ImVec2(-FLT_MIN, editor_height),
         flags
     );
+
+    if (ImGui::BeginPopupContextItem("##editor"))
+    {
+        if (ImGui::MenuItem("Generate line"))
+        {
+            auto line = word_chain.get_line_bigrams();
+            strcat(text, line.c_str());
+        }
+
+        ImGui::EndPopup();
+    }
 
     // Finish window.
     ImGui::End();
@@ -161,7 +173,7 @@ int gui_main()
 
         if (show_editor_window)
         {
-            gui_editor();
+            gui_editor(word_chain);
         }
 
         ImGui::Render();
