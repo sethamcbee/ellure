@@ -150,7 +150,7 @@ void GUI::run_main_menu()
         {
             if (ImGui::MenuItem("Open"))
             {
-                open_file();
+                open_file(filename);
             }
             if (ImGui::MenuItem("Save"))
             {
@@ -261,10 +261,15 @@ void GUI::run_editor()
     ImGui::End();
 }
 
-int GUI::open_file()
+int GUI::open_file(const std::string& name)
 {
     std::stringstream input;
-    std::ifstream input_file{filename};
+    std::ifstream input_file{name};
+    if (!input_file.is_open())
+    {
+        std::cerr << "Error opening document.\n";
+        return EXIT_FAILURE;
+    }
     input << input_file.rdbuf();
     strcpy(editor_text, input.str().c_str());
     return EXIT_SUCCESS;
@@ -280,8 +285,14 @@ int GUI::save_file()
     }
     
     std::ofstream output_file{filename};
-    output_file << editor_text;
-    return EXIT_SUCCESS;
+    if (output_file << editor_text)
+    {
+        return EXIT_SUCCESS;
+    }
+    else
+    {
+        return EXIT_FAILURE;
+    }
 }
 
 }

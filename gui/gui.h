@@ -37,7 +37,7 @@ public:
     void run_editor();
 
     // File operations.
-    int open_file();
+    int open_file(const std::string& name);
     int save_file();
 
 private:
