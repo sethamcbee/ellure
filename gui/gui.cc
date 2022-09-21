@@ -158,6 +158,7 @@ void GUI::run_main_menu()
             }
             if (ImGui::MenuItem("Close"))
             {
+                close();
                 exit(0);
             }
             ImGui::EndMenu();
