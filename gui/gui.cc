@@ -29,6 +29,10 @@ void gui_editor(Ellure::ComplexWordChain& word_chain)
     static ImGuiInputTextFlags flags = ImGuiInputTextFlags_AllowTabInput;
     static char text[1024 * 160];
     bool p_open = true;
+    std::string menu_action;
+
+    // multiple_gen options.    
+    static std::vector<std::string> options;
 
     // Setup window.
     #ifdef IMGUI_HAS_VIEWPORT
@@ -58,6 +62,35 @@ void gui_editor(Ellure::ComplexWordChain& word_chain)
         {
             auto line = word_chain.get_line_bigrams();
             strcat(text, line.c_str());
+        }
+        if (ImGui::MenuItem("Generate multiple line options"))
+        {
+            menu_action = "multiple_gen";
+            options.clear();
+            for (size_t i = 0; i < 5; ++i)
+            {
+                auto line = word_chain.get_line_bigrams();
+                options.push_back(line);
+            }
+        }
+
+        ImGui::EndPopup();
+    }
+
+    if (menu_action == "multiple_gen")
+    {
+        ImGui::OpenPopup("multiple_gen");
+    }
+    if (ImGui::BeginPopup("multiple_gen"))
+    {
+        for (size_t i = 0; i < 5; ++i)
+        {
+            if (ImGui::MenuItem(options[i].c_str()))
+            {
+                strcat(text, options[i].c_str());
+                options.clear();
+                menu_action = "";
+            }
         }
 
         ImGui::EndPopup();
