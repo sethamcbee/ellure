@@ -25,6 +25,7 @@ public:
     // string1 = POS - 2, string2 = POS - 1, string3 = current word
     using Value3 = std::tuple<std::string, std::string, std::string>;
 
+    ComplexWordChain();
     ComplexWordChain(const std::vector<std::string>& input);
 
     std::string get_line_unigrams();

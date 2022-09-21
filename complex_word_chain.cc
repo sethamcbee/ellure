@@ -11,6 +11,11 @@ extern std::string lapos_main(const std::string& input);
 namespace Ellure
 {
 
+ComplexWordChain::ComplexWordChain()
+{
+    // Do nothing.
+}
+
 ComplexWordChain::ComplexWordChain(const std::vector<std::string>& input)
 {
     construct_unigrams(input);

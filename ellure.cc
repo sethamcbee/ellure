@@ -32,9 +32,19 @@ int main(int argc, char* argv[])
     // Initialization.
     srand(time(NULL));
     Ellure::User user{argv[1]};
-    Ellure::Doc doc{"data/testdoc"};
     lapos_init();
 
-    int gui_ret = Ellure::gui_main();
-    return gui_ret;
+    Ellure::GUI gui;
+    int open_status = gui.open();
+    if (open_status != EXIT_SUCCESS)
+    {
+        return open_status;
+    }
+    int main_status = gui.main_loop();
+    if (main_status != EXIT_SUCCESS)
+    {
+        return main_status;
+    }
+    int exit_status = gui.close();
+    return exit_status;
 }
