@@ -23,7 +23,7 @@ extern std::string lapos_main(const std::string& input);
 
 int main(int argc, char* argv[])
 {
-    if (argc != 2)
+    if (argc != 1 && argc != 2)
     {
         std::cerr << "Invalid arguments.\n";
         return 1;
@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 
     // Initialization.
     srand(time(NULL));
-    Ellure::User user{argv[1]};
+    //Ellure::User user{argv[1]};
     lapos_init();
 
     Ellure::GUI gui;
