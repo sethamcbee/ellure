@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <string>
+
 #include "imgui/imgui.h"
 
 #include "complex_word_chain.h"
@@ -34,6 +36,10 @@ public:
     void run_main_menu();
     void run_editor();
 
+    // File operations.
+    int open_file();
+    int save_file();
+
 private:
 
     // Renderer.
@@ -47,6 +53,7 @@ private:
     // Runtime data.
     char editor_text[1024 * 160];
     ComplexWordChain word_chain;
+    std::string filename;
 };
 
 }

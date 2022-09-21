@@ -5,7 +5,9 @@
 #include "gui.h"
 
 #include <cstring>
+#include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include "complex_word_chain.h"
@@ -28,6 +30,7 @@ GUI::GUI()
 {
     Doc doc{"data/testdoc"};
     word_chain = ComplexWordChain{doc.get_words()};
+    filename = "test";
 }
 
 int GUI::open()
@@ -147,9 +150,11 @@ void GUI::run_main_menu()
         {
             if (ImGui::MenuItem("Open"))
             {
+                open_file();
             }
             if (ImGui::MenuItem("Save"))
             {
+                save_file();
             }
             if (ImGui::MenuItem("Close"))
             {
@@ -159,6 +164,13 @@ void GUI::run_main_menu()
         }
         if (ImGui::BeginMenu("Edit"))
         {
+            if (ImGui::MenuItem("Undo"))
+            {
+            }
+            if (ImGui::MenuItem("Redo"))
+            {
+            }
+            ImGui::Separator();
             if (ImGui::MenuItem("Cut"))
             {
             }
@@ -247,6 +259,29 @@ void GUI::run_editor()
 
     // Finish window.
     ImGui::End();
+}
+
+int GUI::open_file()
+{
+    std::stringstream input;
+    std::ifstream input_file{filename};
+    input << input_file.rdbuf();
+    strcpy(editor_text, input.str().c_str());
+    return EXIT_SUCCESS;
+}
+
+int GUI::save_file()
+{
+    // Add terminating newline if needed.
+    const char* p = &editor_text[strlen(editor_text) - 1];
+    if (*p != '\n')
+    {
+        strcat(editor_text, "\n");
+    }
+    
+    std::ofstream output_file{filename};
+    output_file << editor_text;
+    return EXIT_SUCCESS;
 }
 
 }
