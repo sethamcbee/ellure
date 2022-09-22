@@ -5,7 +5,7 @@
 #include "gui/editor.h"
 
 #include "doc.h"
-#include "imgui/imgui.h"
+#include "imgui_custom.h"
 #include "gui/gui.h"
 
 #include <cstring>
@@ -25,7 +25,6 @@ void Editor::run()
     auto& gui = get_gui();
     ImGuiInputTextFlags flags = ImGuiInputTextFlags_AllowTabInput;
     bool p_open = true;
-    std::string menu_action;
 
     // Editor window.
 #ifdef IMGUI_HAS_VIEWPORT
@@ -50,6 +49,7 @@ void Editor::run()
         ImVec2(-FLT_MIN, editor_height),
         flags
     );
+    ImGui::SetItemDefaultFocus();
 
     if (written)
     {
@@ -64,38 +64,44 @@ void Editor::run()
             strcat(text, line.c_str());
             dirty = true;
         }
-        if (ImGui::MenuItem("Generate multiple line options"))
+        if (ImGui::BeginMenu("Generate multiple line options"))
         {
-            menu_action = "multiple_gen";
-            options.clear();
+            if (ImGui::MenuItemPersistent("Regen"))
+            {
+                options.clear();
+            }
+            
+            ImGui::Separator();
+            
+            if (options.size() == 0)
+            {
+                // Generate options.
+                for (size_t i = 0; i < 5; ++i)
+                {
+                    auto line = word_chain.get_line_bigrams();
+                    options.push_back(line);
+                }
+            }
+            // Display options.
             for (size_t i = 0; i < 5; ++i)
             {
-                auto line = word_chain.get_line_bigrams();
-                options.push_back(line);
+                if (ImGui::MenuItem(options[i].c_str()))
+                {
+                    strcat(text, options[i].c_str());
+                    options.clear();
+                    dirty = true;
+                }
             }
+
+            ImGui::EndMenu();
         }
 
         ImGui::EndPopup();
-    }
-
-    if (menu_action == "multiple_gen")
+    }    
+    else
     {
-        ImGui::OpenPopup("multiple_gen");
-    }
-    if (ImGui::BeginPopup("multiple_gen"))
-    {
-        for (size_t i = 0; i < 5; ++i)
-        {
-            if (ImGui::MenuItem(options[i].c_str()))
-            {
-                strcat(text, options[i].c_str());
-                options.clear();
-                menu_action = "";
-                dirty = true;
-            }
-        }
-
-        ImGui::EndPopup();
+        // Popup just closed.
+        options.clear();
     }
 
     // Finish window.
