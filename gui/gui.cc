@@ -20,17 +20,73 @@
 #include "imgui/imgui_impl_sdl.h"
 #include "imgui/imgui_impl_sdlrenderer.h"
 
+// portable-file-dialogs
+#include "portable-file-dialogs/portable-file-dialogs.h"
+
 extern void lapos_init();
 extern std::string lapos_main(const std::string& input);
 
 namespace Ellure
 {
 
+static GUI* gui_singleton = nullptr;
+
+std::string select_file_open()
+{
+    if (!pfd::settings::available())
+    {
+        std::cerr << "PFD not available on this platform.\n";
+        return "";
+    }
+    
+    auto selections = pfd::open_file("Select a file").result();
+    if (!selections.empty())
+    {
+        return selections[0];
+    }
+    else
+    {
+        std::cerr << "User cancelled file selection.\n";
+        return "";
+    }
+}
+
+std::string select_file_save()
+{
+    if (!pfd::settings::available())
+    {
+        std::cerr << "PFD not available on this platform.\n";
+        return "";
+    }
+
+    auto selection = pfd::save_file("Save file").result();
+    if (!selection.empty())
+    {
+        return selection;
+    }
+    else
+    {
+        std::cerr << "User cancelled file selection.\n";
+        return "";
+    }
+}
+
+GUI& get_gui()
+{
+    while (!gui_singleton)
+    {
+        // Wait until GUI is created.
+    }
+    return *gui_singleton;
+}
+
 GUI::GUI()
 {
-    Doc doc{"data/testdoc"};
-    word_chain = ComplexWordChain{doc.get_words()};
-    filename = "test";
+    if (!gui_singleton)
+    {
+        gui_singleton = this;
+    }
+    filename = "";
 }
 
 int GUI::open()
@@ -99,7 +155,7 @@ int GUI::main_loop()
 
         // Do stuff.
         run_main_menu();
-        run_editor();
+        editor.run();
 
         render();
     }
@@ -150,13 +206,36 @@ void GUI::run_main_menu()
         {
             if (ImGui::MenuItem("Open"))
             {
-                open_file(filename);
+                auto user_file = select_file_open();
+                if (user_file != "")
+                {
+                    filename = user_file;
+                    open_file(filename);
+                }
             }
             if (ImGui::MenuItem("Save"))
             {
+                if (filename == "")
+                {
+                    filename = select_file_save();
+                }
                 save_file();
             }
+            if (ImGui::MenuItem("Save as..."))
+            {
+                auto user_file = select_file_save();
+                if (user_file != "")
+                {
+                    filename = user_file;
+                    save_file();
+                }
+            }
             if (ImGui::MenuItem("Close"))
+            {
+                filename = "";
+                strcpy(editor.text, "");
+            }
+            if (ImGui::MenuItem("Exit"))
             {
                 close();
                 exit(0);
@@ -187,81 +266,6 @@ void GUI::run_main_menu()
     }
 }
 
-void GUI::run_editor()
-{
-    ImGuiInputTextFlags flags = ImGuiInputTextFlags_AllowTabInput;
-    bool p_open = true;
-    std::string menu_action;
-    
-    // multiple_gen options.    
-    static std::vector<std::string> options;
-
-    // Editor window.
-#ifdef IMGUI_HAS_VIEWPORT
-    ImGuiViewport* viewport = ImGui::GetMainViewport();
-    ImGui::SetNextWindowPos(viewport->GetWorkPos());
-    ImGui::SetNextWindowSize(viewport->GetWorkSize());
-    ImGui::SetNextWindowViewport(viewport->ID);
-#else 
-    ImGui::SetNextWindowPos(ImVec2(0.0f, main_menu_size.y));
-    ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
-#endif
-    //ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-    ImGui::Begin("Editor", &p_open, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoResize);
-
-    auto editor_height = ImGui::GetWindowHeight() - 4.0f * ImGui::GetTextLineHeight();
-    ImGui::InputTextMultiline(
-        "##editor",
-        editor_text,
-        IM_ARRAYSIZE(editor_text),
-        ImVec2(-FLT_MIN, editor_height),
-        flags
-    );
-
-    if (ImGui::BeginPopupContextItem("##editor"))
-    {
-        if (ImGui::MenuItem("Generate line"))
-        {
-            auto line = word_chain.get_line_bigrams();
-            strcat(editor_text, line.c_str());
-        }
-        if (ImGui::MenuItem("Generate multiple line options"))
-        {
-            menu_action = "multiple_gen";
-            options.clear();
-            for (size_t i = 0; i < 5; ++i)
-            {
-                auto line = word_chain.get_line_bigrams();
-                options.push_back(line);
-            }
-        }
-
-        ImGui::EndPopup();
-    }
-
-    if (menu_action == "multiple_gen")
-    {
-        ImGui::OpenPopup("multiple_gen");
-    }
-    if (ImGui::BeginPopup("multiple_gen"))
-    {
-        for (size_t i = 0; i < 5; ++i)
-        {
-            if (ImGui::MenuItem(options[i].c_str()))
-            {
-                strcat(editor_text, options[i].c_str());
-                options.clear();
-                menu_action = "";
-            }
-        }
-
-        ImGui::EndPopup();
-    }
-
-    // Finish window.
-    ImGui::End();
-}
-
 int GUI::open_file(const std::string& name)
 {
     std::stringstream input;
@@ -272,22 +276,28 @@ int GUI::open_file(const std::string& name)
         return EXIT_FAILURE;
     }
     input << input_file.rdbuf();
-    strcpy(editor_text, input.str().c_str());
+    strcpy(editor.text, input.str().c_str());
     return EXIT_SUCCESS;
 }
 
 int GUI::save_file()
 {
     // Add terminating newline if needed.
-    const char* p = &editor_text[strlen(editor_text) - 1];
+    const char* p = &editor.text[strlen(editor.text) - 1];
     if (*p != '\n')
     {
-        strcat(editor_text, "\n");
+        strcat(editor.text, "\n");
+    }
+
+    if (filename == "")
+    {
+        return EXIT_FAILURE;
     }
     
     std::ofstream output_file{filename};
-    if (output_file << editor_text)
+    if (output_file << editor.text)
     {
+        editor.dirty = false;
         return EXIT_SUCCESS;
     }
     else

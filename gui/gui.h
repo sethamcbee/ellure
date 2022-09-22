@@ -9,6 +9,7 @@
 #include "imgui/imgui.h"
 
 #include "complex_word_chain.h"
+#include "gui/editor.h"
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -16,7 +17,9 @@ struct SDL_Renderer;
 namespace Ellure
 {
 
-int gui_main();
+class GUI;
+
+GUI& get_gui();
 
 class GUI
 {
@@ -34,11 +37,13 @@ public:
     void render();
 
     void run_main_menu();
-    void run_editor();
 
     // File operations.
     int open_file(const std::string& name);
     int save_file();
+
+    // Public data.
+    ImVec2 main_menu_size;
 
 private:
 
@@ -48,11 +53,9 @@ private:
 
     // IMGUI config and data.
     ImVec4 clear_color{0.45f, 0.55f, 0.60f, 1.00f};
-    ImVec2 main_menu_size;
 
     // Runtime data.
-    char editor_text[1024 * 160];
-    ComplexWordChain word_chain;
+    Editor editor;
     std::string filename;
 };
 
