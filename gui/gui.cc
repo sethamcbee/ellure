@@ -12,6 +12,7 @@
 
 #include "complex_word_chain.h"
 #include "doc.h"
+#include "imgui_custom.h"
 
 // SDL
 #include <SDL2/SDL.h>
@@ -153,7 +154,7 @@ int GUI::main_loop()
 
         new_frame();
 
-        // Do stuff.
+        run_global_shortcuts();
         run_main_menu();
         editor.run();
 
@@ -204,7 +205,7 @@ void GUI::run_main_menu()
         main_menu_size = ImGui::GetWindowSize();
         if (ImGui::BeginMenu("File"))
         {
-            if (ImGui::MenuItem("Open"))
+            if (ImGui::MenuItem("Open", "CTRL+O"))
             {
                 auto user_file = select_file_open();
                 if (user_file != "")
@@ -213,7 +214,7 @@ void GUI::run_main_menu()
                     open_file(filename);
                 }
             }
-            if (ImGui::MenuItem("Save"))
+            if (ImGui::MenuItem("Save", "CTRL+S"))
             {
                 if (filename == "")
                 {
@@ -221,7 +222,7 @@ void GUI::run_main_menu()
                 }
                 save_file();
             }
-            if (ImGui::MenuItem("Save as..."))
+            if (ImGui::MenuItem("Save as...", "CTRL+SHIFT+S"))
             {
                 auto user_file = select_file_save();
                 if (user_file != "")
@@ -230,7 +231,7 @@ void GUI::run_main_menu()
                     save_file();
                 }
             }
-            if (ImGui::MenuItem("Close"))
+            if (ImGui::MenuItem("Close", "CTRL+C"))
             {
                 filename = "";
                 strcpy(editor.text, "");
@@ -266,6 +267,48 @@ void GUI::run_main_menu()
     }
 }
 
+void GUI::run_global_shortcuts()
+{
+    if (ImGui::Shortcut(ImGuiKeyModFlags_Ctrl, ImGuiKey_O, false))
+    {
+        ImGui::ClearActiveID();
+        auto user_file = select_file_open();
+        if (user_file != "")
+        {
+            filename = user_file;
+            open_file(filename);
+        }
+    }
+    if (ImGui::Shortcut(ImGuiKeyModFlags_Ctrl, ImGuiKey_S, false))
+    {
+        if (filename == "")
+        {
+            filename = select_file_save();
+        }
+        save_file();
+    }
+    if (ImGui::Shortcut(ImGuiKeyModFlags_Ctrl | ImGuiKeyModFlags_Shift, ImGuiKey_S, false))
+    {
+        auto user_file = select_file_save();
+        if (user_file != "")
+        {
+            filename = user_file;
+            save_file();
+        }
+    }
+    if (ImGui::Shortcut(ImGuiKeyModFlags_Ctrl, ImGuiKey_C, false))
+    {
+        ImGui::ClearActiveID();
+        filename = "";
+        strcpy(editor.text, "");
+    }
+    if (ImGui::Shortcut(ImGuiKeyModFlags_Ctrl, ImGuiKey_Q, false))
+    {
+        close();
+        exit(0);
+    }
+}
+
 int GUI::open_file(const std::string& name)
 {
     std::stringstream input;
@@ -276,7 +319,7 @@ int GUI::open_file(const std::string& name)
         return EXIT_FAILURE;
     }
     input << input_file.rdbuf();
-    strncpy(editor.text, input.str().c_str(), sizeof(editor.text - 1));
+    strncpy(editor.text, input.str().c_str(), 1024 * 160 - 1);
     return EXIT_SUCCESS;
 }
 

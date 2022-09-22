@@ -37,6 +37,7 @@ public:
     void render();
 
     void run_main_menu();
+    void run_global_shortcuts();
 
     // File operations.
     int open_file(const std::string& name);

@@ -10,16 +10,16 @@
 namespace ImGui
 {
 
-static bool MenuItemPersistent(const std::string& label)
+static inline bool MenuItemPersistent(const std::string& label)
 {
     bool ret;
     
-    ImGui::PushItemFlag(
+    PushItemFlag(
         ImGuiItemFlags_SelectableDontClosePopup,
         true
     );
     
-    if (ImGui::MenuItem("Regen"))
+    if (MenuItem("Regen"))
     {
         ret = true;
     }
@@ -28,9 +28,14 @@ static bool MenuItemPersistent(const std::string& label)
         ret = false;
     }
     
-    ImGui::PopItemFlag();
+    PopItemFlag();
 
     return ret;
+}
+
+static inline bool Shortcut(ImGuiKeyModFlags mod, ImGuiKey key, bool repeat)
+{
+	return mod == GetMergedModFlags() && IsKeyPressed(GetKeyIndex(key), repeat);
 }
 
 }
