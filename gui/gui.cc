@@ -276,7 +276,7 @@ int GUI::open_file(const std::string& name)
         return EXIT_FAILURE;
     }
     input << input_file.rdbuf();
-    strcpy(editor.text, input.str().c_str());
+    strncpy(editor.text, input.str().c_str(), sizeof(editor.text - 1));
     return EXIT_SUCCESS;
 }
 
