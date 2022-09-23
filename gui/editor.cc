@@ -13,6 +13,16 @@
 namespace Ellure
 {
 
+static int editor_callback(ImGuiInputTextCallbackData* data)
+{
+    auto& gui = get_gui();
+    auto& editor = gui.editor;
+    editor.cursor_pos = (size_t)data->CursorPos;
+    editor.selection_start = (size_t)data->SelectionStart;
+    editor.selection_end = (size_t)data->SelectionEnd;
+    return 0;
+}
+
 Editor::Editor()
 {
     strcpy(text, "");
@@ -23,7 +33,10 @@ Editor::Editor()
 void Editor::run()
 {
     auto& gui = get_gui();
-    ImGuiInputTextFlags flags = ImGuiInputTextFlags_AllowTabInput;
+    ImGuiInputTextFlags flags =
+        ImGuiInputTextFlags_AllowTabInput
+        | ImGuiInputTextFlags_CallbackAlways
+    ;
     bool p_open = true;
 
     // Editor window.
@@ -47,7 +60,8 @@ void Editor::run()
         text,
         IM_ARRAYSIZE(text),
         ImVec2(-FLT_MIN, editor_height),
-        flags
+        flags,
+        editor_callback
     );
     ImGui::SetItemDefaultFocus();
 

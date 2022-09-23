@@ -45,7 +45,7 @@ Doc::Doc(const std::string& filename)
             }
             continue;
         }
-        
+
         if (tok_v[i] != "," && tok_v[i - 1] != "[NEWLINE]")
         {
             tok_str += ' ';
@@ -77,7 +77,7 @@ const std::vector<std::string>& Doc::get_words() const
 const char* Doc::get_word(const char* input)
 {
     std::string word;
-    
+
     auto is_good = [](char c)
     {
         switch (c)
@@ -102,7 +102,7 @@ const char* Doc::get_word(const char* input)
 
     // Iterate if this word starts on a bad character.
     while (!is_good(*input) && *input != '\0')
-    {        
+    {
         if (*input == ',')
         {
             word += *input;
@@ -126,7 +126,8 @@ const char* Doc::get_word(const char* input)
 
     do
     {
-        word += tolower(*input);
+        //word += tolower(*input);
+        word += *input;
         ++input;
     }
     while (is_good(*input));

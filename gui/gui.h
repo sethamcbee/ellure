@@ -50,16 +50,12 @@ public:
     int open_file(const std::string& name);
     int save_file();
 
-    // Public data.
-    ImVec2 main_menu_size;
-
-private:
-
     // Renderer.
     SDL_Window* sdl_window = nullptr;
     SDL_Renderer* sdl_renderer = nullptr;
 
     // IMGUI config and data.
+    ImVec2 main_menu_size;
     ImVec4 clear_color{0.45f, 0.55f, 0.60f, 1.00f};
     bool save_then_new = false;
     bool save_then_open = false;

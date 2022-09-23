@@ -25,6 +25,11 @@ public:
     ComplexWordChain word_chain;
     bool dirty = false;
 
+    // Callback state.
+    size_t cursor_pos = 0;
+    size_t selection_start = 0;
+    size_t selection_end = 0;
+
     // GUI state.
     std::vector<std::string> word_options;
     std::vector<std::string> options;
