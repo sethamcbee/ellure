@@ -32,6 +32,10 @@ public:
     std::string get_line_bigrams();
     std::string get_line_trigrams();
 
+    std::string get_word_unigrams();
+    std::string get_word_bigrams();
+    std::string get_word_trigrams();
+
 private:
 
     std::mt19937 rng{(long unsigned int)time(NULL)};

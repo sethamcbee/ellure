@@ -81,7 +81,7 @@ std::string ComplexWordChain::get_line_unigrams()
                 continue;
             }
         }
-        
+
         if (t != "," && output != "")
         {
             output += " ";
@@ -162,7 +162,7 @@ std::string ComplexWordChain::get_line_bigrams()
                 continue;
             }
         }
-        
+
         if (t != "," && output != "")
         {
             output += " ";
@@ -243,7 +243,7 @@ std::string ComplexWordChain::get_line_trigrams()
                 continue;
             }
         }
-        
+
         if (t != "," && output != "")
         {
             output += " ";
@@ -263,6 +263,56 @@ std::string ComplexWordChain::get_line_trigrams()
 
     trigrams.set_state(trigram_beginnings.get(rng));
     return output;
+}
+
+std::string ComplexWordChain::get_word_unigrams()
+{
+}
+
+std::string ComplexWordChain::get_word_bigrams()
+{
+    do
+    {
+        auto pair = bigrams.get();
+        auto word = std::get<1>(pair);
+
+        if (word == "[END]")
+        {
+            bigrams.set_state(bigram_beginnings.get(rng));
+            continue;
+        }
+
+        if (word == "[START]")
+        {
+            continue;
+        }
+
+        if (word == "Gim" || word == "gim" || word == "Lem" || word == "lem")
+        {
+            word += "me";
+            return word;
+        }
+
+        if (word == "Gon" || word == "gon" || word == "Wan" || word == "wan")
+        {
+            word += "na";
+            return word;
+        }
+
+        if (word == "Got" || word == "got")
+        {
+            word += "ta";
+            return word;
+        }
+
+        // Else, whole word.
+        return word;
+    }
+    while (1);
+}
+
+std::string ComplexWordChain::get_word_trigrams()
+{
 }
 
 void ComplexWordChain::construct_unigrams(const std::vector<std::string>& input)

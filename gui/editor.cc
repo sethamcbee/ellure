@@ -32,7 +32,7 @@ void Editor::run()
     ImGui::SetNextWindowPos(viewport->GetWorkPos());
     ImGui::SetNextWindowSize(viewport->GetWorkSize());
     ImGui::SetNextWindowViewport(viewport->ID);
-#else 
+#else
     ImGui::SetNextWindowPos(ImVec2(0.0f, gui.main_menu_size.y));
     ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
 #endif
@@ -58,6 +58,43 @@ void Editor::run()
 
     if (ImGui::BeginPopupContextItem("##editor"))
     {
+        if (ImGui::MenuItem("Generate word"))
+        {
+            auto word = word_chain.get_word_bigrams();
+            strcat(text, word.c_str());
+            dirty = true;
+        }
+        if (ImGui::BeginMenu("Generate multiple word options"))
+        {
+            if (ImGui::MenuItemPersistent("Regen"))
+            {
+                word_options.clear();
+            }
+
+            ImGui::Separator();
+
+            if (word_options.size() == 0)
+            {
+                // Generate options.
+                for (size_t i = 0; i < 10; ++i)
+                {
+                    auto word = word_chain.get_word_bigrams();
+                    word_options.push_back(word);
+                }
+            }
+            // Display options.
+            for (size_t i = 0; i < 10; ++i)
+            {
+                if (ImGui::MenuItem(word_options[i].c_str()))
+                {
+                    strcat(text, word_options[i].c_str());
+                    word_options.clear();
+                    dirty = true;
+                }
+            }
+
+            ImGui::EndMenu();
+        }
         if (ImGui::MenuItem("Generate line"))
         {
             auto line = word_chain.get_line_bigrams();
@@ -70,9 +107,9 @@ void Editor::run()
             {
                 options.clear();
             }
-            
+
             ImGui::Separator();
-            
+
             if (options.size() == 0)
             {
                 // Generate options.
@@ -97,7 +134,7 @@ void Editor::run()
         }
 
         ImGui::EndPopup();
-    }    
+    }
     else
     {
         // Popup just closed.

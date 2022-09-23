@@ -26,6 +26,7 @@ public:
     bool dirty = false;
 
     // GUI state.
+    std::vector<std::string> word_options;
     std::vector<std::string> options;
 };
 
