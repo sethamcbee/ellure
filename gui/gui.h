@@ -39,6 +39,13 @@ public:
     void run_main_menu();
     void run_global_shortcuts();
 
+    // User actions.
+    void prompt_new_file();
+    void prompt_open_file();
+    void prompt_save_file();
+    void prompt_save_file_as();
+    void prompt_quit();
+
     // File operations.
     int open_file(const std::string& name);
     int save_file();

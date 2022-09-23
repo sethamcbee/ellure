@@ -39,7 +39,7 @@ std::string select_file_open()
         std::cerr << "PFD not available on this platform.\n";
         return "";
     }
-    
+
     auto selections = pfd::open_file("Select a file").result();
     if (!selections.empty())
     {
@@ -173,12 +173,12 @@ int GUI::close()
     SDL_DestroyRenderer(sdl_renderer);
     SDL_DestroyWindow(sdl_window);
     SDL_Quit();
-    
+
     return EXIT_SUCCESS;
 }
 
 void GUI::new_frame()
-{    
+{
     ImGui_ImplSDLRenderer_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
@@ -207,39 +207,23 @@ void GUI::run_main_menu()
         {
             if (ImGui::MenuItem("New", "CTRL+N"))
             {
-                filename = "";
-                strcpy(editor.text, "");
+                prompt_new_file();
             }
             if (ImGui::MenuItem("Open", "CTRL+O"))
             {
-                auto user_file = select_file_open();
-                if (user_file != "")
-                {
-                    filename = user_file;
-                    open_file(filename);
-                }
+                prompt_open_file();
             }
             if (ImGui::MenuItem("Save", "CTRL+S"))
             {
-                if (filename == "")
-                {
-                    filename = select_file_save();
-                }
-                save_file();
+                prompt_save_file();
             }
             if (ImGui::MenuItem("Save as...", "CTRL+SHIFT+S"))
             {
-                auto user_file = select_file_save();
-                if (user_file != "")
-                {
-                    filename = user_file;
-                    save_file();
-                }
+                prompt_save_file_as();
             }
-            if (ImGui::MenuItem("Exit"))
+            if (ImGui::MenuItem("Exit", "CTRL+Q"))
             {
-                close();
-                exit(0);
+                prompt_quit();
             }
             ImGui::EndMenu();
         }
@@ -272,41 +256,66 @@ void GUI::run_global_shortcuts()
     if (ImGui::Shortcut(ImGuiKeyModFlags_Ctrl, ImGuiKey_N, false))
     {
         ImGui::ClearActiveID();
-        filename = "";
-        strcpy(editor.text, "");
+        prompt_new_file();
     }
     if (ImGui::Shortcut(ImGuiKeyModFlags_Ctrl, ImGuiKey_O, false))
     {
         ImGui::ClearActiveID();
-        auto user_file = select_file_open();
-        if (user_file != "")
-        {
-            filename = user_file;
-            open_file(filename);
-        }
+        prompt_open_file();
     }
     if (ImGui::Shortcut(ImGuiKeyModFlags_Ctrl, ImGuiKey_S, false))
     {
-        if (filename == "")
-        {
-            filename = select_file_save();
-        }
-        save_file();
+        prompt_save_file();
     }
     if (ImGui::Shortcut(ImGuiKeyModFlags_Ctrl | ImGuiKeyModFlags_Shift, ImGuiKey_S, false))
     {
-        auto user_file = select_file_save();
-        if (user_file != "")
-        {
-            filename = user_file;
-            save_file();
-        }
+        prompt_save_file_as();
     }
     if (ImGui::Shortcut(ImGuiKeyModFlags_Ctrl, ImGuiKey_Q, false))
     {
-        close();
-        exit(0);
+        prompt_quit();
     }
+}
+
+void GUI::prompt_new_file()
+{
+    filename = "";
+    strcpy(editor.text, "");
+}
+
+void GUI::prompt_open_file()
+{
+    auto user_file = select_file_open();
+    if (user_file != "")
+    {
+        filename = user_file;
+        open_file(filename);
+    }
+}
+
+void GUI::prompt_save_file()
+{    
+    if (filename == "")
+    {
+        filename = select_file_save();
+    }
+    save_file();
+}
+
+void GUI::prompt_save_file_as()
+{    
+    auto user_file = select_file_save();
+    if (user_file != "")
+    {
+        filename = user_file;
+        save_file();
+    }
+}
+
+void GUI::prompt_quit()
+{    
+    close();
+    exit(0);
 }
 
 int GUI::open_file(const std::string& name)
@@ -336,7 +345,7 @@ int GUI::save_file()
     {
         return EXIT_FAILURE;
     }
-    
+
     std::ofstream output_file{filename};
     if (output_file << editor.text)
     {
