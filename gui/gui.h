@@ -61,6 +61,9 @@ private:
 
     // IMGUI config and data.
     ImVec4 clear_color{0.45f, 0.55f, 0.60f, 1.00f};
+    bool save_then_new = false;
+    bool save_then_open = false;
+    bool save_then_quit = false;
 
     // Runtime data.
     Editor editor;

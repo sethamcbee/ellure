@@ -158,6 +158,87 @@ int GUI::main_loop()
         run_main_menu();
         editor.run();
 
+        if (save_then_new)
+        {
+            ImGui::OpenPopup("save_then_new");
+            save_then_new = false;
+        }
+        if (ImGui::BeginPopupModal("save_then_new"))
+        {
+            ImGui::Text("Do you want to save first?");
+            if (ImGui::Button("Yes"))
+            {
+                prompt_save_file();
+                ImGui::CloseCurrentPopup();
+                prompt_new_file();
+            }
+            if (ImGui::Button("No"))
+            {
+                editor.dirty = false;
+                ImGui::CloseCurrentPopup();
+                prompt_new_file();
+            }
+            if (ImGui::Button("Cancel"))
+            {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        if (save_then_open)
+        {
+            ImGui::OpenPopup("save_then_open");
+            save_then_open = false;
+        }
+        if (ImGui::BeginPopupModal("save_then_open"))
+        {
+            ImGui::Text("Do you want to save first?");
+            if (ImGui::Button("Yes"))
+            {
+                prompt_save_file();
+                ImGui::CloseCurrentPopup();
+                prompt_open_file();
+            }
+            if (ImGui::Button("No"))
+            {
+                editor.dirty = false;
+                ImGui::CloseCurrentPopup();
+                prompt_open_file();
+            }
+            if (ImGui::Button("Cancel"))
+            {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        if (save_then_quit)
+        {
+            ImGui::OpenPopup("save_then_quit");
+            save_then_quit = false;
+        }
+        if (ImGui::BeginPopupModal("save_then_quit"))
+        {
+            ImGui::Text("Do you want to save first?");
+            if (ImGui::Button("Yes"))
+            {
+                prompt_save_file();
+                ImGui::CloseCurrentPopup();
+                prompt_quit();
+            }
+            if (ImGui::Button("No"))
+            {
+                editor.dirty = false;
+                ImGui::CloseCurrentPopup();
+                prompt_quit();
+            }
+            if (ImGui::Button("Cancel"))
+            {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
         render();
     }
 
@@ -279,12 +360,24 @@ void GUI::run_global_shortcuts()
 
 void GUI::prompt_new_file()
 {
+    if (editor.dirty)
+    {
+        save_then_new = true;
+        return;
+    }
+
     filename = "";
     strcpy(editor.text, "");
 }
 
 void GUI::prompt_open_file()
 {
+    if (editor.dirty)
+    {
+        save_then_open = true;
+        return;
+    }
+
     auto user_file = select_file_open();
     if (user_file != "")
     {
@@ -294,7 +387,7 @@ void GUI::prompt_open_file()
 }
 
 void GUI::prompt_save_file()
-{    
+{
     if (filename == "")
     {
         filename = select_file_save();
@@ -303,7 +396,7 @@ void GUI::prompt_save_file()
 }
 
 void GUI::prompt_save_file_as()
-{    
+{
     auto user_file = select_file_save();
     if (user_file != "")
     {
@@ -313,7 +406,13 @@ void GUI::prompt_save_file_as()
 }
 
 void GUI::prompt_quit()
-{    
+{
+    if (editor.dirty)
+    {
+        save_then_quit = true;
+        return;
+    }
+
     close();
     exit(0);
 }
