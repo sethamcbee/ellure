@@ -205,6 +205,11 @@ void GUI::run_main_menu()
         main_menu_size = ImGui::GetWindowSize();
         if (ImGui::BeginMenu("File"))
         {
+            if (ImGui::MenuItem("New", "CTRL+N"))
+            {
+                filename = "";
+                strcpy(editor.text, "");
+            }
             if (ImGui::MenuItem("Open", "CTRL+O"))
             {
                 auto user_file = select_file_open();
@@ -230,11 +235,6 @@ void GUI::run_main_menu()
                     filename = user_file;
                     save_file();
                 }
-            }
-            if (ImGui::MenuItem("Close", "CTRL+C"))
-            {
-                filename = "";
-                strcpy(editor.text, "");
             }
             if (ImGui::MenuItem("Exit"))
             {
@@ -269,6 +269,12 @@ void GUI::run_main_menu()
 
 void GUI::run_global_shortcuts()
 {
+    if (ImGui::Shortcut(ImGuiKeyModFlags_Ctrl, ImGuiKey_N, false))
+    {
+        ImGui::ClearActiveID();
+        filename = "";
+        strcpy(editor.text, "");
+    }
     if (ImGui::Shortcut(ImGuiKeyModFlags_Ctrl, ImGuiKey_O, false))
     {
         ImGui::ClearActiveID();
@@ -295,12 +301,6 @@ void GUI::run_global_shortcuts()
             filename = user_file;
             save_file();
         }
-    }
-    if (ImGui::Shortcut(ImGuiKeyModFlags_Ctrl, ImGuiKey_C, false))
-    {
-        ImGui::ClearActiveID();
-        filename = "";
-        strcpy(editor.text, "");
     }
     if (ImGui::Shortcut(ImGuiKeyModFlags_Ctrl, ImGuiKey_Q, false))
     {

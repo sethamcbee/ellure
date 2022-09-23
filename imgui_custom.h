@@ -19,7 +19,7 @@ static inline bool MenuItemPersistent(const std::string& label)
         true
     );
     
-    if (MenuItem("Regen"))
+    if (MenuItem(label.c_str()))
     {
         ret = true;
     }
