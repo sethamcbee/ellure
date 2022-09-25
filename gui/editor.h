@@ -8,6 +8,9 @@
 #include <vector>
 
 #include "complex_word_chain.h"
+#include "imgui_custom.h"
+
+class ImGuiInputTextCallbackData;
 
 namespace Ellure
 {
@@ -26,9 +29,7 @@ public:
     bool dirty = false;
 
     // Callback state.
-    size_t cursor_pos = 0;
-    size_t selection_start = 0;
-    size_t selection_end = 0;
+    ImGuiInputTextCallbackData callback;
 
     // GUI state.
     std::vector<std::string> word_options;

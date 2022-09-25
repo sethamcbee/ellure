@@ -13,13 +13,19 @@
 namespace Ellure
 {
 
+void string_insert(char* dest, const char* src)
+{
+    std::string dest_backup{dest};
+    auto src_len = strlen(src);
+    strcpy(dest, src);
+    strcat(dest + src_len, dest_backup.c_str());
+}
+
 static int editor_callback(ImGuiInputTextCallbackData* data)
 {
     auto& gui = get_gui();
     auto& editor = gui.editor;
-    editor.cursor_pos = (size_t)data->CursorPos;
-    editor.selection_start = (size_t)data->SelectionStart;
-    editor.selection_end = (size_t)data->SelectionEnd;
+    editor.callback = *data;
     return 0;
 }
 
@@ -75,7 +81,8 @@ void Editor::run()
         if (ImGui::MenuItem("Generate word"))
         {
             auto word = word_chain.get_word_bigrams();
-            strcat(text, word.c_str());
+            auto pos = callback.CursorPos;
+            string_insert(text + pos, word.c_str());
             dirty = true;
         }
         if (ImGui::BeginMenu("Generate multiple word options"))
@@ -101,7 +108,8 @@ void Editor::run()
             {
                 if (ImGui::MenuItem(word_options[i].c_str()))
                 {
-                    strcat(text, word_options[i].c_str());
+                    auto pos = callback.CursorPos;
+                    string_insert(text + pos, word_options[i].c_str());
                     word_options.clear();
                     dirty = true;
                 }
@@ -112,7 +120,8 @@ void Editor::run()
         if (ImGui::MenuItem("Generate line"))
         {
             auto line = word_chain.get_line_bigrams();
-            strcat(text, line.c_str());
+            auto pos = callback.CursorPos;
+            string_insert(text + pos, line.c_str());
             dirty = true;
         }
         if (ImGui::BeginMenu("Generate multiple line options"))
@@ -138,9 +147,10 @@ void Editor::run()
             {
                 if (ImGui::MenuItem(options[i].c_str()))
                 {
-                    strcat(text, options[i].c_str());
-                    options.clear();
+                    auto pos = callback.CursorPos;
+                    string_insert(text + pos, options[i].c_str());
                     dirty = true;
+                    options.clear();
                 }
             }
 
