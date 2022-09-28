@@ -31,45 +31,7 @@ public:
 
     void insert(const T& cur, const T& next)
     {
-        // Check if current state exists.
-        int i_cur;
-        auto it_cur = state_map.find(cur);
-        if (it_cur != state_map.end())
-        {
-            i_cur = it_cur->second;
-        }
-        else
-        {
-            // Add new state.
-            i_cur = states.size();
-            state_map[cur] = i_cur;
-
-            ChainState<T> new_state;
-            new_state.element = cur;
-            states.push_back(new_state);
-        }
-
-        // Check if next state exists.
-        int i_next;
-        auto it_next = state_map.find(next);
-        if (it_next != state_map.end())
-        {
-            i_next = it_next->second;
-        }
-        else
-        {
-            // Add new state.
-            i_next = states.size();
-            state_map[next] = i_next;
-
-            ChainState<T> new_state;
-            new_state.element = next;
-            states.push_back(new_state);
-        }
-
-        // Add new link to chain.
-        states[i_cur].sequences.insert(i_next, default_weight);
-        ++links;
+        insert(cur, next, default_weight);
     }
 
     void insert(const T& cur, const T& next, Weight weight)
@@ -118,7 +80,7 @@ public:
     void prepare()
     {
         states.shrink_to_fit();
-        
+
         for (auto& s : states)
         {
             s.sequences.prepare();
@@ -128,7 +90,7 @@ public:
     const T& get()
     {
         const auto& ret = states[state].element;
-        
+
         // Advance internal state.
         while (states[state].sequences.size() == 0)
         {
@@ -167,6 +129,30 @@ public:
     {
         size_t max = states.size();
         state = rand() % max;
+    }
+
+    void scale(Weight multiplier)
+    {
+        for (auto& state : states)
+        {
+            state.sequences.scale(multiplier);
+        }
+    }
+
+    void merge(const Chain<T>& other)
+    {
+        for (const auto& state : other.states)
+        {
+            const auto& t0 = state.element;
+            const auto& seq = state.sequences;
+            for (size_t i = 0; i < seq.elements.size(); ++i)
+            {
+                const auto& e1 = seq.elements[i];
+                const auto& t1 = other.states[e1].element;
+                const auto& w = seq.weights[i];
+                insert(t0, t1, w);
+            }
+        }
     }
 
     void set_state(const T& s)

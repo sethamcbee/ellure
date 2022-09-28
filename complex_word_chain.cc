@@ -23,6 +23,28 @@ ComplexWordChain::ComplexWordChain(const std::vector<std::string>& input)
     construct_trigrams(input);
 }
 
+void ComplexWordChain::scale(Weight multiplier)
+{
+    unigrams.scale(multiplier);
+    bigrams.scale(multiplier);
+    trigrams.scale(multiplier);
+
+    unigram_beginnings.scale(multiplier);
+    bigram_beginnings.scale(multiplier);
+    trigram_beginnings.scale(multiplier);
+}
+
+void ComplexWordChain::merge(const ComplexWordChain& other)
+{
+    unigrams.merge(other.unigrams);
+    bigrams.merge(other.bigrams);
+    trigrams.merge(other.trigrams);
+
+    unigram_beginnings.merge(other.unigram_beginnings);
+    bigram_beginnings.merge(other.bigram_beginnings);
+    trigram_beginnings.merge(other.trigram_beginnings);
+}
+
 std::string ComplexWordChain::get_line_unigrams()
 {
     std::string last;
@@ -331,7 +353,7 @@ void ComplexWordChain::construct_unigrams(const std::vector<std::string>& input)
             continue;
         }
 
-        Weight weight{1.0 / input.size()};
+        Weight weight{default_weight};
         bool first = true;
         for (size_t i = start; i < end; ++i)
         {
@@ -436,7 +458,7 @@ void ComplexWordChain::construct_trigrams(const std::vector<std::string>& input)
         const auto& pos_data = pos.get_data();
 
         // Check for short line.
-        Weight weight{1.0 / pos_data.size()};
+        Weight weight{default_weight};
         if (end - start < 3) // START{0} he{1} died{2} END{3}
         {
             auto gram0 = std::tuple{"[START]", "[START]", input[start + 1]};

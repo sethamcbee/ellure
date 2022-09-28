@@ -28,6 +28,10 @@ public:
     ComplexWordChain();
     ComplexWordChain(const std::vector<std::string>& input);
 
+    void scale(Weight multiplier);
+
+    void merge(const ComplexWordChain& other);
+
     std::string get_line_unigrams();
     std::string get_line_bigrams();
     std::string get_line_trigrams();
