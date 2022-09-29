@@ -7,8 +7,12 @@
 #include "doc.h"
 #include "imgui_custom.h"
 #include "gui/gui.h"
+#include "pos.h"
 
 #include <cstring>
+
+extern std::string lapos_main(const std::string& input);
+extern void tokenize_ellure(const std::string & s1, std::vector<std::string> & lt);
 
 namespace Ellure
 {
@@ -27,6 +31,31 @@ static int editor_callback(ImGuiInputTextCallbackData* data)
     auto& editor = gui.editor;
     editor.callback = *data;
     return 0;
+}
+
+LineState::LineState()
+{
+    // Do nothing.
+}
+
+LineState::LineState(const char* start, const char* end)
+{
+    std::string line;
+    auto p = start;
+    while (p != end)
+    {
+        line += *p;
+        ++p;
+    }
+
+    tokens.clear();
+    tokenize_ellure(line, tokens);
+    tokens.insert(tokens.begin(), "[START]");
+    tokens.push_back("[END]");
+
+    auto pos_str = lapos_main(line);
+    POS pos_data{pos_str};
+    pos = pos_data.get_data();
 }
 
 Editor::Editor()
@@ -165,8 +194,24 @@ void Editor::run()
         options.clear();
     }
 
+    // TEST
+    update_context();
+
     // Finish window.
     ImGui::End();
+}
+
+void Editor::update_context()
+{
+    // Find start of current line.
+    size_t cursor = (size_t)callback.CursorPos;
+    size_t line_start = cursor;
+    while (line_start > 0 && text[line_start] != '\n')
+    {
+        --line_start;
+    }
+
+    current_line = LineState{text + line_start, text + cursor};
 }
 
 }

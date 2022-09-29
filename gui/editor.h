@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -15,6 +16,15 @@ class ImGuiInputTextCallbackData;
 namespace Ellure
 {
 
+struct LineState
+{
+    LineState();
+    LineState(const char* start, const char* end);
+
+    std::vector<std::string> tokens;
+    std::vector<std::string> pos;
+};
+
 class Editor
 {
 public:
@@ -23,10 +33,14 @@ public:
 
     void run();
 
+    // Get context of current line.
+    void update_context();
+
     // Runtime data.
     char text[1024 * 160];
     ComplexWordChain word_chain;
     bool dirty = false;
+    LineState current_line;
 
     // Callback state.
     ImGuiInputTextCallbackData callback;
