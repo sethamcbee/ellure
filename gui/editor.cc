@@ -133,7 +133,7 @@ void Editor::run()
                 }
             }
             // Display options.
-            for (size_t i = 0; i < 10; ++i)
+            for (size_t i = 0; i < word_options.size(); ++i)
             {
                 if (ImGui::MenuItem(word_options[i].c_str()))
                 {
@@ -172,7 +172,7 @@ void Editor::run()
                 }
             }
             // Display options.
-            for (size_t i = 0; i < 5; ++i)
+            for (size_t i = 0; i < options.size(); ++i)
             {
                 if (ImGui::MenuItem(options[i].c_str()))
                 {

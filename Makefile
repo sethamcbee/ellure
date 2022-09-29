@@ -123,7 +123,7 @@ cloc:
 .PHONY: cppcheck
 cppcheck:
 ifneq (, $(shell which cppcheck))
-	cppcheck -j 2 -ivendor -q --enable=warning,portability $(INCLUDE_SCRIPT) .
+	cppcheck -j 2 -ivendor -q --enable=warning,portability -ilapos -iimgui -iportable-file-dialogs $(INCLUDE_SCRIPT) .
 endif
 
 # Beautify code.
