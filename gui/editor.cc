@@ -103,6 +103,7 @@ void Editor::run()
     if (written)
     {
         dirty = true;
+        update_context();
     }
 
     if (ImGui::BeginPopupContextItem("##editor"))
@@ -193,9 +194,6 @@ void Editor::run()
         // Popup just closed.
         options.clear();
     }
-
-    // TEST
-    update_context();
 
     // Finish window.
     ImGui::End();
