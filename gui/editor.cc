@@ -10,6 +10,11 @@
 #include "pos.h"
 
 #include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <sstream>
+
+namespace fs = std::filesystem;
 
 extern std::string lapos_main(const std::string& input);
 extern void tokenize_ellure(const std::string & s1, std::vector<std::string> & lt);
@@ -61,8 +66,47 @@ LineState::LineState(const char* start, const char* end)
 Editor::Editor()
 {
     strcpy(text, "");
+#if 0
     Doc doc{"data/testdoc"};
     word_chain = ComplexWordChain{doc.get_words()};
+#endif
+
+    // Open config file.
+    const char* config_filename = "data/config.ini";
+    std::ifstream config_file(config_filename);
+    // TODO: Check if config file opened.
+
+    // Read config file.
+    std::string line;
+    while (std::getline(config_file, line))
+    {
+        if (line == "")
+        {
+            // Ignore blank lines.
+            continue;
+        }
+        active_banks.push_back(line);
+    }
+
+    // Read each file in each bank.
+    for (const auto& bank : active_banks)
+    {
+        auto bank_path = "data/banks/" + bank;
+        fs::recursive_directory_iterator dir_it{bank_path};
+        for (const auto& dir_entry : dir_it)
+        {
+            if (!dir_entry.is_regular_file())
+            {
+                // Skip over subdirectories.
+                continue;
+            }
+            std::string file_path{dir_entry.path().string()};
+            Doc doc{file_path};
+            ComplexWordChain chain{doc.get_words()};
+            chain.scale(1.0 / chain.get_size());
+            word_chain.merge(chain);
+        }
+    }
 }
 
 void Editor::run()

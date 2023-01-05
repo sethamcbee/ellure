@@ -83,6 +83,7 @@ const char* Doc::get_word(const char* input)
         switch (c)
         {
         case '"':
+        case '`':
         case ',':
         case '.':
         case '?':

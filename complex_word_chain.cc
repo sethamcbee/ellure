@@ -23,6 +23,11 @@ ComplexWordChain::ComplexWordChain(const std::vector<std::string>& input)
     construct_trigrams(input);
 }
 
+Weight ComplexWordChain::get_size()
+{
+    return unigrams.links;
+}
+
 void ComplexWordChain::scale(Weight multiplier)
 {
     unigrams.scale(multiplier);

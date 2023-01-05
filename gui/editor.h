@@ -36,6 +36,9 @@ public:
     // Get context of current line.
     void update_context();
 
+    // Config data.
+    std::vector<std::string> active_banks;
+
     // Runtime data.
     char text[1024 * 160];
     ComplexWordChain word_chain;

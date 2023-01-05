@@ -28,6 +28,8 @@ public:
     ComplexWordChain();
     ComplexWordChain(const std::vector<std::string>& input);
 
+    Weight get_size();
+
     void scale(Weight multiplier);
 
     void merge(const ComplexWordChain& other);

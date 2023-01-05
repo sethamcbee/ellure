@@ -171,8 +171,6 @@ public:
         return size;
     }
 
-private:
-
     std::mt19937 rng{(long unsigned int)time(NULL)};
     int state = 0;
     int links = 0;
