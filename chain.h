@@ -125,6 +125,21 @@ public:
         }
     }
 
+    Weight get_options(const T& first)
+    {
+        const auto it = state_map.find(first);
+        if (it == state_map.end())
+        {
+            return 0.0;
+        }
+        else
+        {
+            auto i = it->second;
+            const auto& state = states[i];
+            return state.sequences.size();
+        }
+    }
+
     void reset()
     {
         size_t max = states.size();

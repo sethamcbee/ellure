@@ -21,6 +21,7 @@ struct LineState
     LineState();
     LineState(const char* start, const char* end);
 
+    std::string line;
     std::vector<std::string> tokens;
     std::vector<std::string> pos;
 };

@@ -45,7 +45,7 @@ LineState::LineState()
 
 LineState::LineState(const char* start, const char* end)
 {
-    std::string line;
+    line = "";
     auto p = start;
     while (p != end)
     {
@@ -66,10 +66,6 @@ LineState::LineState(const char* start, const char* end)
 Editor::Editor()
 {
     strcpy(text, "");
-#if 0
-    Doc doc{"data/testdoc"};
-    word_chain = ComplexWordChain{doc.get_words()};
-#endif
 
     // Open config file.
     const char* config_filename = "data/config.ini";
@@ -154,7 +150,8 @@ void Editor::run()
     {
         if (ImGui::MenuItem("Generate word"))
         {
-            auto word = word_chain.get_word_bigrams();
+            //auto word = word_chain.get_word_bigrams();
+            auto word = word_chain.get_word_state(current_line);
             auto pos = callback.CursorPos;
             string_insert(text + pos, word.c_str());
             dirty = true;
@@ -173,7 +170,8 @@ void Editor::run()
                 // Generate options.
                 for (size_t i = 0; i < 10; ++i)
                 {
-                    auto word = word_chain.get_word_bigrams();
+                    //auto word = word_chain.get_word_bigrams();
+                    auto word = word_chain.get_word_state(current_line);
                     word_options.push_back(word);
                 }
             }
@@ -193,7 +191,8 @@ void Editor::run()
         }
         if (ImGui::MenuItem("Generate line"))
         {
-            auto line = word_chain.get_line_bigrams();
+            //auto line = word_chain.get_line_bigrams();
+            auto line = word_chain.get_line_state(current_line);
             auto pos = callback.CursorPos;
             string_insert(text + pos, line.c_str());
             dirty = true;
@@ -212,7 +211,8 @@ void Editor::run()
                 // Generate options.
                 for (size_t i = 0; i < 5; ++i)
                 {
-                    auto line = word_chain.get_line_bigrams();
+                    //auto line = word_chain.get_line_bigrams();
+                    auto line = word_chain.get_line_state(current_line);
                     options.push_back(line);
                 }
             }

@@ -4,6 +4,7 @@
 
 #include "complex_word_chain.h"
 
+#include "gui/editor.h"
 #include "pos.h"
 
 extern std::string lapos_main(const std::string& input);
@@ -48,6 +49,143 @@ void ComplexWordChain::merge(const ComplexWordChain& other)
     unigram_beginnings.merge(other.unigram_beginnings);
     bigram_beginnings.merge(other.bigram_beginnings);
     trigram_beginnings.merge(other.trigram_beginnings);
+}
+
+std::string ComplexWordChain::get_word_state(const LineState& state)
+{
+    // Get current state.
+    size_t current_i = state.tokens.size() - 2;
+    const auto& current_word = state.tokens[current_i];
+    std::string pos_0;
+    std::string pos_1;
+    if (state.pos.size() == 2)
+    {
+        pos_0 = "[START]";
+        pos_1 = "[START]";
+    }
+    else if (state.pos.size() == 3)
+    {
+        pos_0 = "[START]";
+        pos_1 = state.pos[current_i - 1];
+    }
+    else
+    {
+        pos_0 = state.pos[current_i - 2];
+        pos_1 = state.pos[current_i - 1];
+    }
+    Value2 current_v2{pos_0, current_word};
+    Value3 current_v3{pos_0, pos_1, current_word};
+
+    // Get n-gram possibilities.
+    int uni_max = unigrams.get_options(current_word);
+    int bi_max = uni_max + bigrams.get_options(current_v2);
+    int tri_max = bi_max + trigrams.get_options(current_v3);
+
+    // Determine which mode we'll use to generate a word.
+    int roll = rand() % tri_max;
+    if (roll == 0)
+    {
+        return get_word_unigrams();
+    }
+    else if (roll < uni_max)
+    {
+        unigrams.set_state(current_word);
+        get_word_unigrams();
+        return get_word_unigrams();
+    }
+    else if (roll < bi_max)
+    {
+        bigrams.set_state(current_v2);
+        get_word_bigrams();
+        return get_word_bigrams();
+    }
+    else
+    {
+        // roll <= tri_max
+        trigrams.set_state(current_v3);
+        get_word_trigrams();
+        return get_word_trigrams();
+    }
+}
+
+std::string ComplexWordChain::get_line_state(const LineState& state)
+{
+    int n = 0;
+    std::string last;
+    std::string output;
+    do
+    {
+        ++n;
+        if (n > 10)
+        {
+            return output;
+        }
+
+        auto whole_line = state.line + output;
+        auto start = whole_line.c_str();
+        auto end = start + whole_line.size();
+        LineState running_state{start, end};
+        auto word = get_word_state(running_state);
+
+        if (word == "[END]")
+        {
+            return output;
+        }
+
+        if (word == "[START]")
+        {
+            continue;
+        }
+
+        if (word == "'s"
+            || word == "'m"
+            || word == "'d"
+            || word == "'ll"
+            || word == "'re"
+            || word == "'ve"
+            || word == "n't")
+        {
+            output += word;
+            last = word;
+            continue;
+        }
+        if (last == "Gim" || last == "gim" || last == "Lem" || last == "lem")
+        {
+            if (word == "me")
+            {
+                output += word;
+                last = word;
+                continue;
+            }
+        }
+        if (last == "Gon" || last == "gon" || last == "Wan" || last == "wan")
+        {
+            if (word == "na")
+            {
+                output += word;
+                last = word;
+                continue;
+            }
+        }
+        if (last == "Got" || last == "got")
+        {
+            if (word == "ta")
+            {
+                output += word;
+                last = word;
+                continue;
+            }
+        }
+
+        if (word != "," && output != "")
+        {
+            output += " ";
+        }
+        output += word;
+    }
+    while (1);
+
+    return output;
 }
 
 std::string ComplexWordChain::get_line_unigrams()
@@ -294,6 +432,37 @@ std::string ComplexWordChain::get_line_trigrams()
 
 std::string ComplexWordChain::get_word_unigrams()
 {
+    do
+    {
+        auto word = unigrams.get();
+
+        if (word == "[END]")
+        {
+            unigrams.set_state(unigram_beginnings.get(rng));
+            continue;
+        }
+
+        if (word == "[START]")
+        {
+            continue;
+        }
+
+        if (word == "Gim" || word == "gim" || word == "Lem" || word == "lem")
+        {
+            word += "me";
+            return word;
+        }
+
+        if (word == "Gon" || word == "gon" || word == "Wan" || word == "wan")
+        {
+            word += "na";
+            return word;
+        }
+
+        // Else, whole word.
+        return word;
+    }
+    while (1);
 }
 
 std::string ComplexWordChain::get_word_bigrams()
@@ -326,12 +495,6 @@ std::string ComplexWordChain::get_word_bigrams()
             return word;
         }
 
-        if (word == "Got" || word == "got")
-        {
-            word += "ta";
-            return word;
-        }
-
         // Else, whole word.
         return word;
     }
@@ -340,6 +503,38 @@ std::string ComplexWordChain::get_word_bigrams()
 
 std::string ComplexWordChain::get_word_trigrams()
 {
+    do
+    {
+        auto tuple = trigrams.get();
+        auto word = std::get<2>(tuple);
+
+        if (word == "[END]")
+        {
+            trigrams.set_state(trigram_beginnings.get(rng));
+            continue;
+        }
+
+        if (word == "[START]")
+        {
+            continue;
+        }
+
+        if (word == "Gim" || word == "gim" || word == "Lem" || word == "lem")
+        {
+            word += "me";
+            return word;
+        }
+
+        if (word == "Gon" || word == "gon" || word == "Wan" || word == "wan")
+        {
+            word += "na";
+            return word;
+        }
+
+        // Else, whole word.
+        return word;
+    }
+    while (1);
 }
 
 void ComplexWordChain::construct_unigrams(const std::vector<std::string>& input)

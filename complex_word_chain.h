@@ -12,6 +12,8 @@
 namespace Ellure
 {
 
+struct LineState;
+
 class ComplexWordChain
 {
 public:
@@ -33,6 +35,9 @@ public:
     void scale(Weight multiplier);
 
     void merge(const ComplexWordChain& other);
+
+    std::string get_word_state(const LineState& state);
+    std::string get_line_state(const LineState& state);
 
     std::string get_line_unigrams();
     std::string get_line_bigrams();
