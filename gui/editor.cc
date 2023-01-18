@@ -40,7 +40,10 @@ static int editor_callback(ImGuiInputTextCallbackData* data)
 
 LineState::LineState()
 {
-    // Do nothing.
+    tokens.insert(tokens.begin(), "[START]");
+    tokens.push_back("[END]");
+    pos.insert(pos.begin(), "[START]");
+    pos.push_back("[END]");
 }
 
 LineState::LineState(const char* start, const char* end)

@@ -73,7 +73,7 @@ std::string ComplexWordChain::get_word_state(const LineState& state)
         pos_0 = state.pos[current_i - 2];
         pos_1 = state.pos[current_i - 1];
     }
-    Value2 current_v2{pos_0, current_word};
+    Value2 current_v2{pos_1, current_word};
     Value3 current_v3{pos_0, pos_1, current_word};
 
     // Get n-gram possibilities.
@@ -83,14 +83,22 @@ std::string ComplexWordChain::get_word_state(const LineState& state)
 
     // Determine which mode we'll use to generate a word.
     int roll = rand() % tri_max;
-    if (roll == 0)
+    if (current_word == "[START]")
     {
-        return get_word_unigrams();
+        bigrams.set_state(bigram_beginnings.get(rng));
+        return get_word_bigrams();
     }
     else if (roll < uni_max)
     {
-        unigrams.set_state(current_word);
-        get_word_unigrams();
+        if (current_word == "[START]")
+        {
+            unigrams.set_state(unigram_beginnings.get(rng));
+        }
+        else
+        {
+            unigrams.set_state(current_word);
+            get_word_unigrams();
+        }
         return get_word_unigrams();
     }
     else if (roll < bi_max)
@@ -116,7 +124,7 @@ std::string ComplexWordChain::get_line_state(const LineState& state)
     do
     {
         ++n;
-        if (n > 10)
+        if (n > 20)
         {
             return output;
         }
@@ -475,7 +483,7 @@ std::string ComplexWordChain::get_word_bigrams()
         if (word == "[END]")
         {
             bigrams.set_state(bigram_beginnings.get(rng));
-            continue;
+            return word;
         }
 
         if (word == "[START]")
@@ -511,7 +519,7 @@ std::string ComplexWordChain::get_word_trigrams()
         if (word == "[END]")
         {
             trigrams.set_state(trigram_beginnings.get(rng));
-            continue;
+            return word;
         }
 
         if (word == "[START]")
