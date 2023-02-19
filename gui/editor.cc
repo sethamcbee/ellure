@@ -102,7 +102,7 @@ Editor::Editor()
             std::string file_path{dir_entry.path().string()};
             Doc doc{file_path};
             ComplexWordChain chain{doc.get_words()};
-            chain.scale(1.0 / chain.get_size());
+            //chain.scale(1.0 / chain.get_size());
             word_chain.merge(chain);
         }
     }
@@ -128,13 +128,13 @@ void Editor::run()
     ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
 #endif
     //ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-    ImGui::Begin("Editor", &p_open,
+    ImGui::Begin("Editor##editor", &p_open,
         ImGuiWindowFlags_NoDecoration
         | ImGuiWindowFlags_NoResize);
 
     auto editor_height = ImGui::GetWindowHeight() - 4.0f * ImGui::GetTextLineHeight();
     bool written = ImGui::InputTextMultiline(
-        "##editor",
+        "##text",
         text,
         IM_ARRAYSIZE(text),
         ImVec2(-FLT_MIN, editor_height),
@@ -149,7 +149,7 @@ void Editor::run()
         update_context();
     }
 
-    if (ImGui::BeginPopupContextItem("##editor"))
+    if (ImGui::BeginPopupContextItem("##editorcontext"))
     {
         if (ImGui::MenuItem("Generate word"))
         {
@@ -159,7 +159,7 @@ void Editor::run()
             string_insert(text + pos, word.c_str());
             dirty = true;
         }
-        if (ImGui::BeginMenu("Generate multiple word options"))
+        if (ImGui::BeginMenu("Generate multiple word options##multword"))
         {
             if (ImGui::MenuItemPersistent("Regen"))
             {
@@ -192,7 +192,7 @@ void Editor::run()
 
             ImGui::EndMenu();
         }
-        if (ImGui::MenuItem("Generate line"))
+        if (ImGui::MenuItem("Generate line##"))
         {
             //auto line = word_chain.get_line_bigrams();
             auto line = word_chain.get_line_state(current_line);
@@ -200,9 +200,9 @@ void Editor::run()
             string_insert(text + pos, line.c_str());
             dirty = true;
         }
-        if (ImGui::BeginMenu("Generate multiple line options"))
+        if (ImGui::BeginMenu("Generate multiple line options##multline"))
         {
-            if (ImGui::MenuItemPersistent("Regen"))
+            if (ImGui::MenuItemPersistent("Regen##regen"))
             {
                 options.clear();
             }
